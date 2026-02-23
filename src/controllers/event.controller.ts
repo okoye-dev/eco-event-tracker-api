@@ -27,3 +27,13 @@ export const createEvent = async (req: Request, res: Response, next: NextFunctio
     next(error);
   }
 };
+
+export const getEventDetails = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { eventId } = req.params;
+    const result = await eventService.getEventDetailsWithCalculatedCo2(eventId);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};

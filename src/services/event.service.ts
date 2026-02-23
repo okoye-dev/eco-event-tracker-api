@@ -1,5 +1,10 @@
 import { eventRepository } from '../repositories/event.repository';
-import { CreateEventRequest, CreateEventResult } from '../types/events';
+import {
+  CreateEventRequest,
+  CreateEventResult,
+  EventDetailsResponse
+} from '../types/events';
+import { co2CalculationService } from './co2-calculation.service';
 
 const isValidDate = (value: string) => !Number.isNaN(Date.parse(value));
 
@@ -60,6 +65,28 @@ export class EventService {
       },
       createdBy
     );
+  }
+
+  async getEventDetailsWithCalculatedCo2(eventId: string): Promise<EventDetailsResponse> {
+    if (!eventId?.trim()) {
+      throw Object.assign(new Error('eventId is required'), { statusCode: 400 });
+    }
+
+    const result = await eventRepository.getEventWithEmissionAndFactors(eventId);
+
+    if (!result) {
+      throw Object.assign(new Error('Event not found'), { statusCode: 404 });
+    }
+
+    const emissionResult = await co2CalculationService.calculate(result.emissionData, result.factors);
+
+    return {
+      title: result.event.title,
+      location: result.event.location,
+      event_date: result.event.event_date,
+      total_co2: emissionResult.total_co2,
+      breakdown: emissionResult.breakdown
+    };
   }
 }
 

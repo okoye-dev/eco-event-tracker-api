@@ -34,3 +34,32 @@ export interface CreateEventResult {
   event: EventRow;
   emissionData: EventEmissionDataRow;
 }
+
+export interface EmissionFactorRow {
+  id: string;
+  category: 'energy' | 'travel' | 'catering' | 'waste';
+  unit: string;
+  value: number;
+  created_at: string;
+}
+
+export interface EventWithEmissionAndFactors {
+  event: EventRow;
+  emissionData: EventEmissionDataRow;
+  factors: EmissionFactorRow[];
+}
+
+export interface EventEmissionBreakdown {
+  energy: number;
+  travel: number;
+  catering: number;
+  waste: number;
+}
+
+export interface EventDetailsResponse {
+  title: string;
+  location: string;
+  event_date: string;
+  total_co2: number;
+  breakdown: EventEmissionBreakdown;
+}

@@ -1,5 +1,12 @@
 import { supabase } from '../config/supabase';
-import { CreateEventRequest, CreateEventResult, EventEmissionDataRow, EventRow } from '../types/events';
+import {
+  CreateEventRequest,
+  CreateEventResult,
+  EmissionFactorRow,
+  EventEmissionDataRow,
+  EventRow,
+  EventWithEmissionAndFactors
+} from '../types/events';
 
 export class EventRepository {
   async createEventWithEmissionData(input: CreateEventRequest, createdBy: string): Promise<CreateEventResult> {
@@ -38,6 +45,46 @@ export class EventRepository {
     }
 
     return { event: event as EventRow, emissionData: emissionData as EventEmissionDataRow };
+  }
+
+  async getEventWithEmissionAndFactors(eventId: string): Promise<EventWithEmissionAndFactors | null> {
+    const { data: event, error: eventError } = await supabase
+      .from('events')
+      .select('*')
+      .eq('id', eventId)
+      .single();
+
+    if (eventError) {
+      if (eventError.code === 'PGRST116') {
+        return null;
+      }
+      throw new Error(eventError.message || 'Failed to fetch event');
+    }
+
+    const { data: emissionData, error: emissionError } = await supabase
+      .from('event_emission_data')
+      .select('*')
+      .eq('event_id', eventId)
+      .single();
+
+    if (emissionError || !emissionData) {
+      throw new Error(emissionError?.message || 'Failed to fetch emission data');
+    }
+
+    const { data: factors, error: factorError } = await supabase
+      .from('emission_factors')
+      .select('*')
+      .in('category', ['energy', 'travel', 'catering', 'waste']);
+
+    if (factorError || !factors) {
+      throw new Error(factorError?.message || 'Failed to fetch emission factors');
+    }
+
+    return {
+      event: event as EventRow,
+      emissionData: emissionData as EventEmissionDataRow,
+      factors: factors as EmissionFactorRow[]
+    };
   }
 }
 
