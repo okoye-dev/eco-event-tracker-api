@@ -26,7 +26,8 @@ Stores event information.
 * title (string)
 * location (string)
 * event_date (date)
-* attendance_count (int)
+* participant_count (int)
+* is_virtual (boolean)
 * created_by (FK → User.id)
 * created_at (timestamp)
 
@@ -115,4 +116,3 @@ Factors are stored in the `EmissionFactor` table.
   /utils
   app.js
 ```
-
