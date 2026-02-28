@@ -28,7 +28,8 @@ CREATE TABLE IF NOT EXISTS events (
   title VARCHAR(255) NOT NULL,
   location VARCHAR(255) NOT NULL,
   event_date DATE NOT NULL,
-  attendance_count INTEGER NOT NULL DEFAULT 0,
+  participant_count INTEGER NOT NULL DEFAULT 0,
+  is_virtual BOOLEAN NOT NULL DEFAULT FALSE,
   created_by UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
