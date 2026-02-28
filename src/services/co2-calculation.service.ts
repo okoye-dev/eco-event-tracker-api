@@ -1,7 +1,7 @@
-import { EventEmissionDataRow, EventEmissionBreakdown, EmissionFactorRow } from '../types/events';
+import { EventEmissionDataRow, EventEmissionBreakdown } from '../types/events';
 import { estimateCateringEmissions } from './catering/catering.service';
 import { calculatePowerEmissions } from './power/power.service';
-import { calculateTransportEmissions, estimateTransportEmissions } from './transport/transport.service';
+import { estimateTransportEmissions } from './transport/transport.service';
 import { calculateWasteEmissions } from './waste/waste.service';
 
 export interface Co2ComputationResult {
@@ -10,7 +10,8 @@ export interface Co2ComputationResult {
 }
 
 export interface Co2CalculationServiceEmissionData extends EventEmissionDataRow {
-  num_participants: number
+  participant_count: number;
+  is_virtual: boolean;
 }
 
 // export interface Co2CalculationService {
@@ -27,14 +28,23 @@ class Co2CalculationService {
       disposalMethod: "recycling",
       quantityG: emissionData.waste_kg / 1_000,
     }]);
-    const transportCo2 = estimateTransportEmissions(emissionData.num_participants);
+    const transportCo2 =
+      emissionData.is_virtual || emissionData.participant_count <= 0
+        ? { totalKgCO2e: 0 }
+        : estimateTransportEmissions(emissionData.participant_count);
     const powerCo2 = calculatePowerEmissions([{
       totalKwh: emissionData.energy_kwh,
       source: "grid_electricity",
     }]);
     const cateringCo2 = estimateCateringEmissions(emissionData.catering_meals);
+    const totalCo2 =
+      powerCo2.totalKgCO2e +
+      transportCo2.totalKgCO2e +
+      cateringCo2.totalKgCO2e +
+      wasteCo2.totalKgCO2e;
+
     return {
-      total_co2: emissionData.total_co2,
+      total_co2: totalCo2,
       breakdown: {
         energy: powerCo2.totalKgCO2e,
         travel: transportCo2.totalKgCO2e,

@@ -16,7 +16,8 @@ export class EventRepository {
         title: input.title,
         location: input.location,
         event_date: input.event_date,
-        attendance_count: input.attendance_count,
+        participant_count: input.participant_count,
+        is_virtual: input.is_virtual,
         created_by: createdBy
       })
       .select('*')

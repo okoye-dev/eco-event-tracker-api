@@ -1,6 +1,6 @@
 import { eventService } from './event.service';
 
-const escapeCsv = (value: string | number) => {
+const escapeCsv = (value: string | number | boolean) => {
   const text = String(value ?? '');
   if (text.includes(',') || text.includes('"') || text.includes('\n')) {
     return `"${text.replace(/"/g, '""')}"`;
@@ -49,6 +49,8 @@ export class ReportExportService {
         ['title', details.title],
         ['location', details.location],
         ['event_date', details.event_date],
+        ['participant_count', details.participant_count],
+        ['is_virtual', details.is_virtual],
         ['total_co2', details.total_co2],
         ['breakdown_energy', details.breakdown.energy],
         ['breakdown_travel', details.breakdown.travel],
@@ -69,6 +71,8 @@ export class ReportExportService {
       `Title: ${details.title}`,
       `Location: ${details.location}`,
       `Date: ${details.event_date}`,
+      `Participants: ${details.participant_count}`,
+      `Virtual Event: ${details.is_virtual}`,
       `Total CO2: ${details.total_co2}`,
       `Energy: ${details.breakdown.energy}`,
       `Travel: ${details.breakdown.travel}`,

@@ -9,6 +9,16 @@ import { co2CalculationService } from './co2-calculation.service';
 const isValidDate = (value: string) => !Number.isNaN(Date.parse(value));
 
 const asNumber = (value: unknown) => (typeof value === 'number' ? value : Number(value));
+const asBoolean = (value: unknown) => {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    if (value.toLowerCase() === 'true') return true;
+    if (value.toLowerCase() === 'false') return false;
+  }
+  return undefined;
+};
 
 export class EventService {
   private validateCreateEventPayload(input: CreateEventRequest) {
@@ -22,14 +32,20 @@ export class EventService {
       throw Object.assign(new Error('event_date must be a valid date'), { statusCode: 400 });
     }
 
-    const attendanceCount = asNumber(input.attendance_count);
+    const participantCountInput =
+      input.participant_count ?? (input as unknown as { attendance_count?: unknown }).attendance_count;
+    const participantCount = asNumber(participantCountInput);
+    const isVirtual = asBoolean(input.is_virtual);
     const energyKwh = asNumber(input.energy_kwh);
     const travelKm = asNumber(input.travel_km);
     const cateringMeals = asNumber(input.catering_meals);
     const wasteKg = asNumber(input.waste_kg);
 
-    if (!Number.isInteger(attendanceCount) || attendanceCount < 0) {
-      throw Object.assign(new Error('attendance_count must be a non-negative integer'), { statusCode: 400 });
+    if (!Number.isInteger(participantCount) || participantCount < 0) {
+      throw Object.assign(new Error('participant_count must be a non-negative integer'), { statusCode: 400 });
+    }
+    if (input.is_virtual !== undefined && typeof isVirtual !== 'boolean') {
+      throw Object.assign(new Error('is_virtual must be a boolean'), { statusCode: 400 });
     }
     if (!Number.isFinite(energyKwh) || energyKwh < 0) {
       throw Object.assign(new Error('energy_kwh must be a non-negative number'), { statusCode: 400 });
@@ -52,12 +68,18 @@ export class EventService {
 
     this.validateCreateEventPayload(input);
 
+    const participantCountInput =
+      input.participant_count ?? (input as unknown as { attendance_count?: unknown }).attendance_count;
+    const participantCount = asNumber(participantCountInput);
+    const isVirtual = asBoolean(input.is_virtual) ?? false;
+
     return eventRepository.createEventWithEmissionData(
       {
         title: input.title.trim(),
         location: input.location.trim(),
         event_date: input.event_date,
-        attendance_count: asNumber(input.attendance_count),
+        participant_count: participantCount,
+        is_virtual: isVirtual,
         energy_kwh: asNumber(input.energy_kwh),
         travel_km: asNumber(input.travel_km),
         catering_meals: asNumber(input.catering_meals),
@@ -78,12 +100,18 @@ export class EventService {
       throw Object.assign(new Error('Event not found'), { statusCode: 404 });
     }
 
-    const emissionResult = await co2CalculationService.calculate(result.emissionData, result.factors);
+    const emissionResult = await co2CalculationService.calculate({
+      ...result.emissionData,
+      participant_count: result.event.participant_count,
+      is_virtual: result.event.is_virtual
+    });
 
     return {
       title: result.event.title,
       location: result.event.location,
       event_date: result.event.event_date,
+      participant_count: result.event.participant_count,
+      is_virtual: result.event.is_virtual,
       total_co2: emissionResult.total_co2,
       breakdown: emissionResult.breakdown
     };

@@ -21,10 +21,15 @@ const defineEvent = (sequelize: Sequelize) => {
         type: DataTypes.DATEONLY,
         allowNull: false
       },
-      attendance_count: {
+      participant_count: {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0
+      },
+      is_virtual: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
       },
       created_by: {
         type: DataTypes.UUID,

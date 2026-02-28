@@ -15,7 +15,8 @@ export const createEvent = async (req: Request, res: Response, next: NextFunctio
       title: result.event.title,
       location: result.event.location,
       event_date: result.event.event_date,
-      attendance_count: result.event.attendance_count,
+      participant_count: result.event.participant_count,
+      is_virtual: result.event.is_virtual,
       emission_data: {
         energy_kwh: result.emissionData.energy_kwh,
         travel_km: result.emissionData.travel_km,
