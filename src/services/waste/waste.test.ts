@@ -3,7 +3,7 @@
  * Run with: npx ts-node wasteEmissions.example.ts
  */
 
-import { calculateWasteEmissions, WasteItem } from "./waste.service.js";
+import { calculateWasteEmissions, WasteItem } from "./waste.service";
 
 // Simulate a 200-person evening event
 const eventWaste: WasteItem[] = [

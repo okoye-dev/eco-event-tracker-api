@@ -3,7 +3,7 @@
  * Run with: npx ts-node catering.example.ts
  */
 
-import { calculateCateringEmissions, estimateCateringEmissions, CateringItem } from "./catering.service.js";
+import { calculateCateringEmissions, estimateCateringEmissions, CateringItem } from "./catering.service";
 
 export default function TestCateringCalculation() {
   var log = "";

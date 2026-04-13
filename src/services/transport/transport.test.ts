@@ -7,7 +7,7 @@ import {
   calculateTransportEmissions,
   estimateTransportEmissions,
   ParticipantJourney,
-} from "./transport.service.js";
+} from "./transport.service";
 
 export default function TestTransportCalculation() {
   var log = "";

@@ -3,7 +3,7 @@
  * Run with: npx ts-node power.example.ts
  */
 
-import { calculatePowerEmissions, PowerEntry } from "./power.service.js";
+import { calculatePowerEmissions, PowerEntry } from "./power.service";
 
 export default function TestPowerCalculation() {
   var log = "";

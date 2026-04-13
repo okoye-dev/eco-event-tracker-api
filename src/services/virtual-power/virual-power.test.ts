@@ -5,7 +5,7 @@
 import {
   calculateVirtualPowerEmissions,
   VirtualPowerInput,
-} from "./virtual-power.service.js";
+} from "./virtual-power.service";
 
 export default function TestVirtualPowerCalculation() {
   var log = "";
