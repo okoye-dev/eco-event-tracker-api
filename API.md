@@ -32,6 +32,6 @@ Base URL: `/api`
   ```
 - `GET /events/:eventId`
   - response: `{ title, location, event_date, participant_count, is_virtual, total_co2, breakdown }`
-- `GET /events/:eventId/report?format=csv|pdf`
+- `GET /events/:eventId/report?format=pdf|csv`
   - downloads emission report file
-  - default format: `csv`
+  - default format: `pdf` (`format=csv` for spreadsheet export)

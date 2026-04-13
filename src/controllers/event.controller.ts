@@ -43,8 +43,8 @@ export const getEventDetails = async (req: Request, res: Response, next: NextFun
 export const exportEventReport = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { eventId } = req.params;
-    const queryFormat = String(req.query.format || 'csv').toLowerCase();
-    const format = queryFormat === 'pdf' ? 'pdf' : 'csv';
+    const queryFormat = String(req.query.format ?? 'pdf').toLowerCase();
+    const format = queryFormat === 'csv' ? 'csv' : 'pdf';
 
     const report = await reportExportService.exportByEventId(eventId, format);
 
